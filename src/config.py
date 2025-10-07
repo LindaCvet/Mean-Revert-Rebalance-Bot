@@ -7,7 +7,7 @@ from typing import List
 class Config:
     # Universe
     UNIVERSE: str = os.getenv("UNIVERSE", "TOP100")  # TOP50 | TOP100 | MANUAL
-    WATCHLIST: List[str] = tuple(  # only used if UNIVERSE == MANUAL (CoinGecko IDs)
+    WATCHLIST: List[str] = tuple(
         sym.strip().lower() for sym in os.getenv("WATCHLIST", "").split(",") if sym.strip()
     )
 
@@ -27,7 +27,7 @@ class Config:
     SELL_TOP_N: int = int(os.getenv("SELL_TOP_N", "5"))
 
     # Messaging
-    LANG: str = os.getenv("LANG", "LV")  # LV | ENG
+    LANG: str = os.getenv("LANG", "LV")
     TG_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
     TG_CHAT_IDS: List[str] = tuple(
         x.strip() for x in os.getenv("TELEGRAM_CHAT_ID", "").split(",") if x.strip()
@@ -35,11 +35,17 @@ class Config:
 
     # Data
     COINGECKO_API_KEY: str | None = os.getenv("COINGECKO_API_KEY") or None
-    CG_DAYS: int = int(os.getenv("CG_DAYS", "30"))  # lookback for market_chart
+    CG_DAYS: int = int(os.getenv("CG_DAYS", "30"))
     CG_TIMEOUT: float = float(os.getenv("CG_TIMEOUT", "30"))
 
+    # Robust rate-limit controls (NEW)
+    RATE_LIMIT_SLEEP: float = float(os.getenv("RATE_LIMIT_SLEEP", "1.2"))  # pause starp zvaniem
+    MAX_RETRIES: int = int(os.getenv("MAX_RETRIES", "6"))                  # max atkārtojumi uz 429/5xx
+    RETRY_BACKOFF_MIN: float = float(os.getenv("RETRY_BACKOFF_MIN", "1.0"))
+    RETRY_BACKOFF_MAX: float = float(os.getenv("RETRY_BACKOFF_MAX", "25.0"))
+
     # Misc
-    TZ_NAME: str = os.getenv("TZ_NAME", "Europe/Riga")  # for timestamps in messages
+    TZ_NAME: str = os.getenv("TZ_NAME", "Europe/Riga")
 
 STABLES = {
     "tether", "usd-coin", "binance-usd", "dai", "true-usd", "usdd", "frax",
