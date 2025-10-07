@@ -1,0 +1,49 @@
+name: Mean-Revert Rebalance Bot
+
+on:
+  schedule:
+    # Rīga 09:00  => UTC 06:00
+    - cron: "0 6 * * *"
+    # Rīga 23:00  => UTC 20:00
+    - cron: "0 20 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Mean-Revert bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+          TZ_NAME: Europe/Riga
+          # Optional tunables (defaults already set in config.py):
+          UNIVERSE: TOP100
+          MIN_VOLUME_USD_24H: "20000000"
+          MIN_PRICE_USD: "0.05"
+          EXCLUDE_STABLES: "true"
+          MA_BASE: "7"
+          MA_SHORT: "3"
+          ZSCORE_WINDOW: "7"
+          ZSCORE_THRESHOLD: "1.2"
+          BUY_TOP_N: "5"
+          SELL_TOP_N: "5"
+          LANG: "LV"
+        run: |
+          python main.py
